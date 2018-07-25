@@ -29,9 +29,28 @@ class BreaksPlanner extends EventEmitter {
       }
     })
 
+    this.naturalBreaksManager.on('nextBreak', () => {
+      if (!this.isPaused && this.scheduler.reference !== 'finishMicrobreak' && this.scheduler.reference !== 'finishBreak' && this.scheduler.reference !== null) {
+        this.nextBreak()
+        this.scheduler.timer.pause()
+      }
+    })
+
     this.naturalBreaksManager.on('naturalBreakFinished', (idleTime) => {
       if (!this.isPaused && this.scheduler.reference !== 'finishMicrobreak' && this.scheduler.reference !== 'finishBreak') {
         this.reset()
+      }
+    })
+
+    this.naturalBreaksManager.on('naturalIdleStart', () => {
+      if (!this.isPaused && this.scheduler.timer && this.scheduler.reference !== 'finishMicrobreak' && this.scheduler.reference !== 'finishBreak') {
+        this.scheduler.timer.pause()
+      }
+    })
+
+    this.naturalBreaksManager.on('naturalIdleStop', () => {
+      if (!this.isPaused && this.scheduler.timer && this.scheduler.reference !== 'finishMicrobreak' && this.scheduler.reference !== 'finishBreak') {
+        this.scheduler.timer.resume()
       }
     })
   }
@@ -120,7 +139,7 @@ class BreaksPlanner extends EventEmitter {
     this.breakNumber = 0
   }
 
-  pause (milliseconds) {
+  stretchly_pause (milliseconds) {
     this.clear()
     this.isPaused = true
     if (milliseconds !== 1) {
@@ -129,7 +148,7 @@ class BreaksPlanner extends EventEmitter {
     }
   }
 
-  resume () {
+  stretchly_resume () {
     this.scheduler.cancel()
     this.isPaused = false
     this.nextBreak()
@@ -141,7 +160,7 @@ class BreaksPlanner extends EventEmitter {
 
   reset () {
     this.clear()
-    this.resume()
+    this.stretchly_resume()
   }
 
   naturalBreaks (shouldUse) {

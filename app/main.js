@@ -24,6 +24,7 @@ let tutorialWin = null
 let welcomeWin = null
 let settings
 let pausedForSuspend = false
+let timeLeftWindow = null
 
 app.setAppUserModelId('net.hovancik.stretchly')
 
@@ -354,7 +355,7 @@ function finishMicrobreak (shouldPlaySound = true) {
   if (microbreakWins) {
     if (process.platform === 'darwin') {
       // get focus on the last app
-      Menu.sendActionToFirstResponder('hide:')
+      // Menu.sendActionToFirstResponder('hide:')
     }
     closeWindows(microbreakWins)
     microbreakWins = null
@@ -371,7 +372,7 @@ function finishBreak (shouldPlaySound = true) {
   if (breakWins) {
     if (process.platform === 'darwin') {
       // get focus on the last app
-      Menu.sendActionToFirstResponder('hide:')
+      // Menu.sendActionToFirstResponder('hide:')
     }
     closeWindows(breakWins)
     breakWins = null
@@ -418,13 +419,13 @@ function pauseBreaks (milliseconds) {
   if (breakWins) {
     finishBreak(false)
   }
-  breakPlanner.pause(milliseconds)
+  breakPlanner.stretchly_pause(milliseconds)
   appIcon.setContextMenu(getTrayMenu())
   updateToolTip()
 }
 
 function resumeBreaks () {
-  breakPlanner.resume()
+  breakPlanner.stretchly_resume()
   appIcon.setContextMenu(getTrayMenu())
   processWin.webContents.send('showNotification', i18next.t('main.resumingBreaks'))
   updateToolTip()
@@ -447,6 +448,25 @@ function showAboutWindow () {
   aboutWin.loadURL(modalPath)
   aboutWin.on('closed', () => {
     aboutWin = null
+  })
+}
+
+function showTimeLeftWindow () {
+  if (timeLeftWindow) {
+    timeLeftWindow.show()
+    return
+  }
+  const modalPath = `file://${__dirname}/timeleft.html`
+  timeLeftWindow = new BrowserWindow({
+    icon: `${__dirname}/images/stretchly_18x18.png`,
+    width: 200,
+    height: 120,
+    backgroundColor: settings.get('mainColor'),
+    title: i18next.t('main.timeLeftWindowTitle')
+  })
+  timeLeftWindow.loadURL(modalPath)
+  timeLeftWindow.on('closed', () => {
+    timeLeftWindow = null
   })
 }
 
@@ -492,6 +512,11 @@ function getTrayMenu () {
     label: i18next.t('main.about'),
     click: function () {
       showAboutWindow()
+    }
+  }, {
+    label: i18next.t('main.showTimeLeftWindow'),
+    click: function () {
+      showTimeLeftWindow()
     }
   }, {
     label: i18next.t('main.becomePatron'),
@@ -754,4 +779,9 @@ ipcMain.on('change-language', function (event, language) {
 
 ipcMain.on('open-tutorial', function (event) {
   createTutorialWindow()
+})
+
+ipcMain.on('refresh-time', function (event) {
+  let timeleft = Utils.formatTillBreak(breakPlanner.scheduler.timeLeft)
+  event.sender.send('time-left', timeleft)
 })

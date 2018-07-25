@@ -9,13 +9,10 @@ let formatRemaining = function (seconds) {
 }
 
 let formatTillBreak = function (milliseconds) {
-  let minutes = Math.round(milliseconds / 60000)
-  if (minutes < 1) {
-    let seconds = Math.round((milliseconds % 60000) / 5000) * 5
-    return i18next.t('utils.s', {seconds: seconds})
-  } else {
-    return i18next.t('utils.m', {minutes: minutes})
-  }
+  let minutes = Math.trunc(milliseconds / 60000)
+  let seconds = Math.trunc((milliseconds % 60000) / 1000)
+  if (seconds < 10) seconds = '0' + seconds
+  return minutes + ':' + seconds
 }
 
 let formatPauseTimeLeft = function (milliseconds) {

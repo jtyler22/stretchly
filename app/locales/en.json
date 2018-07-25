@@ -32,7 +32,9 @@
     "microbreak": "microbreak",
     "break": "break",
     "nextBreakFollowing": "\nNext break following {{count}} more microbreak",
-    "nextBreakFollowing_plural": "\nNext break following {{count}} more microbreaks"
+    "nextBreakFollowing_plural": "\nNext break following {{count}} more microbreaks",
+    "showTimeLeftWindow": "Show Time Left Window",
+    "timeLeftWindowTitle": "Time Left"
   },
   "break": {
     "keepGoing": "...nah, I'll just keep going on",
@@ -51,6 +53,9 @@
     "tutorial": "tutorial",
     "latestVersion": "the latest version:",
     "checking": "checking..."
+  },
+  "timeleft": {
+    "title": "Time Left"
   },
   "settings": {
     "settings": "Settings",

@@ -36,14 +36,19 @@ class NaturalBreaksManager extends EventEmitter {
     let lastIdleTime = 0
     this.timer = setInterval(() => {
       let idleTime = this.idleTime
-      if (!this.isOnNaturalBreak && idleTime > 20000) {
+      if (!this.isOnNaturalBreak && idleTime > 5000) {
         this.isOnNaturalBreak = true
+        this.emit('naturalIdleStart')
       }
-      if (this.isOnNaturalBreak && idleTime < 20000) {
+      if (this.isOnNaturalBreak && idleTime < 5000) {
         this.isOnNaturalBreak = false
+        this.emit('naturalIdleStop')
         if (lastIdleTime > this.settings.get('breakDuration')) {
           this.emit('naturalBreakFinished', idleTime)
         }
+      }
+      if (this.isOnNaturalBreak && idleTime > 30000 && idleTime < this.settings.get('breakDuration')) {
+        this.emit('nextBreak')
       }
       if (this.isOnNaturalBreak && idleTime > this.settings.get('breakDuration')) {
         this.emit('clearBreakScheduler')
